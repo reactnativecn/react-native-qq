@@ -1,0 +1,23 @@
+apply plugin: 'com.android.library'
+
+android {
+  compileSdkVersion 23
+  buildToolsVersion "23.0.1"
+
+  defaultConfig {
+    minSdkVersion 16
+    targetSdkVersion 22
+    versionCode 1
+    versionName "1.0"
+    ndk {
+      abiFilters "armeabi-v7a", "x86"
+    }
+  }
+}
+
+dependencies {
+  compile 'com.facebook.react:react-native:0.15.+'
+  compile files('libs/mta-sdk-1.6.2.jar')
+  compile files('libs/open_sdk_r5509.jar')
+}
+

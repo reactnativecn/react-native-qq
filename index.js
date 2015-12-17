@@ -11,23 +11,31 @@ if (!nativeQQAPI){
   }, 100);
 }
 
-export class QQAPIError extends Error {
-  constructor(err, msg){
-    super(msg || "Error occured with QQ API.");
-    this.err = err;
-  }
-}
-
 function translateError(e){
-  if (typeof(e) == 'object' && !(e instanceof  Error)){
-    throw new QQAPIError(e.err, e.errMsg);
+  if (typeof(e) === 'object'){
+    if(e instanceof  Error)
+    {
+      throw e;
+    }
+    else {
+      let error = new Error(e.errMsg || "login error")
+      error.code = e.err
+      throw error;
+    }
+  }
+  else {
+    throw new Error("unkown qq login error")
   }
 }
 
 export function login(scopes){
   return new Promise((resolve, reject)=>{
-    nativeQQAPI.login(scopes, resolve, reject)
+    nativeQQAPI.login(scopes || "", resolve, reject)
   }).catch(translateError)
+}
+
+export function logout(){
+  nativeQQAPI.logout()
 }
 
 export function shareToQQ(data){
@@ -41,3 +49,6 @@ export function shareToQzone(data){
     nativeQQAPI.shareToQzone(data, resolve, reject);
   }).catch(translateError)
 }
+
+
+

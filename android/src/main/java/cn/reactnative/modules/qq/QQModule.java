@@ -26,6 +26,7 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by tdzl2_000 on 2015-10-10.
@@ -165,9 +166,14 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
     public void onComplete(Object o) {
         try {
             JSONObject obj = (JSONObject)(o);
+//            Log.e("QQModule", obj.toString());
+
             WritableMap map = Arguments.createMap();
-            map.putString("openId", obj.getString("openid"));
-            map.putString("accessToken", obj.getString("access_token"));
+            map.putString("openid", obj.getString("openid"));
+            map.putString("access_token", obj.getString("access_token"));
+            map.putString("oauth_consumer_key", this.appId);
+            map.putDouble("expires_in", (new Date().getTime() + obj.getLong("expires_in")));
+
             _resolve(map);
         } catch (Exception e){
             WritableMap map = Arguments.createMap();

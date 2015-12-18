@@ -95,7 +95,7 @@
     self.resolveBlockLogin(@[@{
                                  @"openid":_qqapi.openId,
                                  @"access_token":_qqapi.accessToken,
-                                 @"expires_in":@([_qqapi.expirationDate timeIntervalSince1970]),
+                                 @"expires_in":@([_qqapi.expirationDate timeIntervalSince1970]*1000),
                                  @"oauth_consumer_key":_qqapi.appId
                                  }]);
     self.resolveBlockLogin = nil;

@@ -30,7 +30,7 @@ function translateError(e){
 
 export function login(scopes){
   return new Promise((resolve, reject)=>{
-    nativeQQAPI.login(scopes || "", resolve, reject)
+    nativeQQAPI.login(scopes, resolve, reject)
   }).catch(translateError)
 }
 

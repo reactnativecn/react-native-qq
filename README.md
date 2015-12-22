@@ -1,6 +1,6 @@
 # react-native-qq
 
-React Native的QQ登录插件
+React Native的QQ登录插件, react-native版本需要0.17.0及以上
 
 ## 如何安装
 
@@ -14,9 +14,7 @@ npm install react-native-qq --save
 
 在工程target的`Build Phases->Link Binary with Libraries`中加入`libRCTQQAPI.a、libiconv.tbd、libsqlite3.tbd、liz.tbd、libc++.tbd`
 
-在 `Build Settings->Search Paths->Header Search Paths` 中加入路径 `$(SRCROOT)/../node_modules/react-native-qq/**` 
-
-在 `Build Settings->Search Paths->Framework Search Paths` 中加入路径 `$(SRCROOT)/../node_modules/react-native-qq/**`
+在 `Build Settings->Search Paths->Framework Search Paths` 中加入路径 `$(SRCROOT)/../node_modules/react-native-qq/ios/RCTQQAPI`
 
 在 `Build Settings->Link->Other Linker Flags` 中加入 `-framework "TencentOpenAPI"`
 
@@ -31,16 +29,13 @@ mqzoneopensdkapiV2、mqzoneopensdkapi19、mqzoneopensdkapi、mqzoneopensdk、`
 在你工程的`AppDelegate.m`文件中添加如下代码：
 
 ```
-#import "RCTQQAPI.h"
+#import "RCTLinkingManager.h"
 
 
-- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
-{
-	if ([RCTQQAPI handleUrl:url]) {
-    	return YES;
-  	}
-  	return YES;
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+  return [RCTLinkingManager application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
 }
+
 ```
 
 ### 安装Android工程

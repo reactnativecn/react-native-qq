@@ -23,6 +23,4 @@
 
 @interface RCTQQAPI : NSObject<RCTBridgeModule>
 
-+ (BOOL)handleUrl:(NSURL *)aUrl;
-
 @end

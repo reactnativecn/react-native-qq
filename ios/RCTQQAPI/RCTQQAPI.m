@@ -15,8 +15,7 @@
 #import "RCTBridge.h"
 #import "RCTLog.h"
 
-
-@interface QQAPIInstance : NSObject<QQApiInterfaceDelegate, TencentSessionDelegate> {
+@interface RCTQQAPI()<QQApiInterfaceDelegate, TencentSessionDelegate> {
     TencentOAuth* _qqapi;
 }
 
@@ -25,19 +24,81 @@
 @property (nonatomic, copy) RCTResponseSenderBlock resolveBlockLogin;
 @property (nonatomic, copy) RCTResponseSenderBlock rejectBlockLogin;
 
+
 @end
 
-@implementation QQAPIInstance
 
-+ (instancetype)sharedAPI
+@implementation RCTQQAPI
+
+RCT_EXPORT_MODULE();
+
+- (dispatch_queue_t)methodQueue
 {
-    static QQAPIInstance *_sharedAPI = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _sharedAPI = [[[self class] alloc] init];
-    });
-    return _sharedAPI;
+    return dispatch_get_main_queue();
 }
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleOpenURL:) name:@"RCTOpenURLNotification" object:nil];
+        [self registerAPI];
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+RCT_EXPORT_METHOD(login:(NSString *)scopes resolve:(RCTResponseSenderBlock)resolve reject:(RCTResponseSenderBlock)reject)
+{
+    self.resolveBlockLogin = resolve;
+    self.rejectBlockLogin = reject;
+  
+  if (scopes && scopes.length) {
+    NSArray *scopeArray = [scopes componentsSeparatedByString:@","];
+    [_qqapi authorize:scopeArray];
+  }
+  else {
+    [_qqapi authorize:@[@"get_user_info", @"get_simple_userinfo"]];
+  }
+}
+
+RCT_EXPORT_METHOD(shareToQQ:(NSDictionary *)data resolve:(RCTResponseSenderBlock)resolve reject:(RCTResponseSenderBlock)reject)
+{
+    self.resolveBlockShare = resolve;
+    self.rejectBlockShare = reject;
+    
+    [self shareToQQWithData:data scene:0];
+}
+
+RCT_EXPORT_METHOD(shareToQzone:(NSDictionary *)data resolve:(RCTResponseSenderBlock)resolve reject:(RCTResponseSenderBlock)reject)
+{
+    self.resolveBlockShare = resolve;
+    self.rejectBlockShare = reject;
+    
+    [self shareToQQWithData:data scene:1];
+}
+
+
+RCT_EXPORT_METHOD(getQQState:(RCTResponseSenderBlock)resolve reject:(RCTResponseSenderBlock)reject) {
+  if(![TencentOAuth iphoneQQInstalled]){
+    reject(@[@{@"err":@(-1) ,@"errMsg":@"not installed"}]);
+  }else if (![TencentOAuth iphoneQQSupportSSOLogin]) {
+    reject(@[@{@"err":@(-2) ,@"errMsg":@"not support"}]);
+  }else {
+    resolve(@[@{}]);
+  }
+}
+
+
+RCT_EXPORT_METHOD(logout)
+{
+    [_qqapi logout:nil];
+}
+
 
 - (void)registerAPI
 {
@@ -60,14 +121,12 @@
     });
 }
 
-- (void)authorize:(NSArray *)scopes
-{
-    [_qqapi authorize:scopes];
-}
 
-- (void)unauthorize
+- (void)handleOpenURL:(NSNotification *)note
 {
-    [_qqapi logout:nil];
+    NSDictionary *userInfo = note.userInfo;
+    NSString *url = userInfo[@"url"];
+    [TencentOAuth HandleOpenURL:[NSURL URLWithString:url]];
 }
 
 #pragma mark - qq delegate
@@ -117,33 +176,16 @@
 {
 }
 
+#pragma mark - share private
 
-@end
-
-
-@implementation RCTQQAPI
-
-
-+ (BOOL)handleUrl:(NSURL *)aUrl
+- (void)shareToQQWithData:(NSDictionary *)aData scene:(int)aScene
 {
-    if ([TencentOAuth HandleOpenURL:aUrl])
-    {
-        return YES;
-    }
-    return NO;
-}
-
-
-+ (void)shareToQQWithData:(NSDictionary *)aData scene:(int)aScene
-{
-    QQAPIInstance *handle = [QQAPIInstance sharedAPI];
-    
     NSString *type = aData[RCTQQShareType];
     
     NSString *title = aData[RCTQQShareTitle];
     if (title == nil) {
-        if (handle.rejectBlockShare) {
-            handle.rejectBlockShare(@[@{@"err":@(-1001),@"errMsg":@"title不能为空"}]);
+        if (self.rejectBlockShare) {
+            self.rejectBlockShare(@[@{@"err":@(-1001),@"errMsg":@"title不能为空"}]);
         }
         return;
     }
@@ -152,15 +194,15 @@
     NSString *imgPath = aData[RCTQQShareImageUrl];
     NSString *webpageUrl = aData[RCTQQShareWebpageUrl]? :@"";
     NSString *flashUrl = aData[@"flashUrl"];
-
+    
     QQApiObject *message = nil;
     
     if (type.length <=0 || [type isEqualToString: RCTQQShareTypeNews]) {
         message = [QQApiNewsObject
-                                    objectWithURL:[NSURL URLWithString:webpageUrl]
-                                    title:title
-                                    description:description
-                                    previewImageURL:[NSURL URLWithString:imgPath]];
+                   objectWithURL:[NSURL URLWithString:webpageUrl]
+                   title:title
+                   description:description
+                   previewImageURL:[NSURL URLWithString:imgPath]];
     }
     else if ([type isEqualToString: RCTQQShareTypeText]) {
         message = [QQApiTextObject objectWithText:description];
@@ -174,9 +216,9 @@
     }
     else if ([type isEqualToString: RCTQQShareTypeAudio]) {
         QQApiAudioObject *audioObj = [QQApiAudioObject objectWithURL:[NSURL URLWithString:webpageUrl]
-                                  title:title
-                            description:description
-                        previewImageURL:[NSURL URLWithString:imgPath]];
+                                                               title:title
+                                                         description:description
+                                                     previewImageURL:[NSURL URLWithString:imgPath]];
         if (flashUrl) {
             [audioObj setFlashURL:[NSURL URLWithString:flashUrl]];
         }
@@ -186,7 +228,7 @@
         QQApiVideoObject *videoObj = [QQApiVideoObject objectWithURL:[NSURL URLWithString:webpageUrl]
                                                                title:title
                                                          description:description
-                                                    previewImageURL:[NSURL URLWithString:imgPath]];
+                                                     previewImageURL:[NSURL URLWithString:imgPath]];
         if (flashUrl) {
             [videoObj setFlashURL:[NSURL URLWithString:flashUrl]];
         }
@@ -194,7 +236,7 @@
     }
     
     QQApiSendResultCode sent = EQQAPISENDFAILD;
-
+    
     if (message != nil) {
         SendMessageToQQReq *req = [SendMessageToQQReq reqWithContent:message];
         if (aScene == 0) {
@@ -211,77 +253,10 @@
     else if (sent == EQQAPIAPPSHAREASYNC) {
     }
     else {
-        if (handle.rejectBlockShare) {
-            handle.rejectBlockShare(@[@{@"err":@(sent),@"errMsg":@"qqShareEror"}]);
+        if (self.rejectBlockShare) {
+            self.rejectBlockShare(@[@{@"err":@(sent),@"errMsg":@"qqShareEror"}]);
         }
     }
-}
-
-RCT_EXPORT_MODULE();
-
-- (dispatch_queue_t)methodQueue
-{
-    return dispatch_get_main_queue();
-}
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        [[QQAPIInstance sharedAPI] registerAPI];
-    }
-    return self;
-}
-
-RCT_EXPORT_METHOD(login:(NSString *)scopes resolve:(RCTResponseSenderBlock)resolve reject:(RCTResponseSenderBlock)reject)
-{
-    QQAPIInstance *handle = [QQAPIInstance sharedAPI];
-    handle.resolveBlockLogin = resolve;
-    handle.rejectBlockLogin = reject;
-  
-  if (scopes && scopes.length) {
-    NSArray *scopeArray = [scopes componentsSeparatedByString:@","];
-    [handle authorize:scopeArray];
-  }
-  else {
-    [handle authorize:@[@"get_user_info", @"get_simple_userinfo"]];
-  }
-}
-
-RCT_EXPORT_METHOD(shareToQQ:(NSDictionary *)data resolve:(RCTResponseSenderBlock)resolve reject:(RCTResponseSenderBlock)reject)
-{
-    QQAPIInstance *handle = [QQAPIInstance sharedAPI];
-    handle.resolveBlockShare = resolve;
-    handle.rejectBlockShare = reject;
-    
-    [RCTQQAPI shareToQQWithData:data scene:0];
-}
-
-RCT_EXPORT_METHOD(shareToQzone:(NSDictionary *)data resolve:(RCTResponseSenderBlock)resolve reject:(RCTResponseSenderBlock)reject)
-{
-    QQAPIInstance *handle = [QQAPIInstance sharedAPI];
-    handle.resolveBlockShare = resolve;
-    handle.rejectBlockShare = reject;
-    
-    [RCTQQAPI shareToQQWithData:data scene:1];
-}
-
-
-RCT_EXPORT_METHOD(getQQState:(RCTResponseSenderBlock)resolve reject:(RCTResponseSenderBlock)reject) {
-  if(![TencentOAuth iphoneQQInstalled]){
-    reject(@[@{@"err":@(-1) ,@"errMsg":@"not installed"}]);
-  }else if (![TencentOAuth iphoneQQSupportSSOLogin]) {
-    reject(@[@{@"err":@(-2) ,@"errMsg":@"not support"}]);
-  }else {
-    resolve(@[@{}]);
-  }
-}
-
-
-RCT_EXPORT_METHOD(logout)
-{
-    QQAPIInstance *handle = [QQAPIInstance sharedAPI];
-    [handle unauthorize];
 }
 
 @end

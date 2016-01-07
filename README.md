@@ -53,6 +53,15 @@ project(':react-native-qq').projectDir = new File(rootProject.projectDir, '../no
 compile project(':react-native-qq')
 ```
 
+在`android/app/build.gradle`里的`dependencies`结构中添加如下代码：
+
+```
+dependencies{
+    ... // 原本的代码
+    compile project(':react-native-qq')
+}
+```
+
 在`android/app/src/main/AndroidManifest.xml`里，`<manifest>`标签中添加如下代码：
 
 ```
@@ -106,6 +115,16 @@ import cn.reactnative.modules.qq.QQPackage;
                 .addPackage(new QQPackage())
 ```
 
+另外，确保你的MainActivity.java中有`onActivityResult`的实现：
+
+```java
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        mReactInstanceManager.onActivityResult(requestCode, resultCode, data);
+    }
+```
+
 ## 如何使用
 
 ### 引入包
@@ -151,3 +170,13 @@ import * as QQAPI from 'react-native-qq';
 
 // 其余格式尚未实现。
 ```
+
+## 常见问题
+
+#### Android: 调用QQAPI.login()没有反应
+
+通常出现这个原因是因为Manifest没有配置好，检查Manifest中有关Activity的配置。
+
+#### Android: 已经成功激活QQ登录，但回调没有被执行
+
+通常出现这个原因是因为MainActivity.java中缺少onActivityResult的调用。

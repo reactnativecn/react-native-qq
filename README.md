@@ -29,7 +29,7 @@ mqzoneopensdkapiV2、mqzoneopensdkapi19、mqzoneopensdkapi、mqzoneopensdk、`
 在你工程的`AppDelegate.m`文件中添加如下代码：
 
 ```
-#import "RCTLinkingManager.h"
+#import "../Libraries/LinkingIOS/RCTLinkingManager.h"
 
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
@@ -62,37 +62,8 @@ dependencies{
 }
 ```
 
-在`android/app/src/main/AndroidManifest.xml`里，`<manifest>`标签中添加如下代码：
 
-```
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-```
-
-`<application>`标签中添加如下代码：
-
-```
-		<!-- QQ的APPID -->
-        <meta-data android:name="QQ_APPID" android:value="${QQ_APPID}"/>
-        <!-- QQ接入的回调Activity和辅助Activity -->
-        <activity
-            android:name="com.tencent.tauth.AuthActivity"
-            android:noHistory="true"
-            android:launchMode="singleTask" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="${QQ_APPID}" />
-            </intent-filter>
-        </activity>
-        <activity android:name="com.tencent.connect.common.AssistActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            />
-```
-
-`android/app/build.gradle`里，defaultConfig栏目下添加如下代码：
+在`android/app/build.gradle`里，defaultConfig栏目下添加如下代码：
 
 ```
 		manifestPlaceholders = [

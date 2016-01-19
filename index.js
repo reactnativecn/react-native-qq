@@ -1,54 +1,90 @@
 /**
  * Created by Yun on 2015-12-12.
  */
-import {NativeModules} from 'react-native';
+import {NativeModules, NativeAppEventEmitter} from 'react-native';
+import promisify from 'es6-promisify';
 
-let nativeQQAPI = NativeModules.QQAPI;
+const {QQAPI} = NativeModules;
 
-if (!nativeQQAPI){
-  setTimeout(()=>{
-    throw new Error("Cannot get native modules of react-native-qq.");
-  }, 100);
+function translateError(err, result) {
+    if (!err) {
+        return this.resolve(result);
+    }
+    if (typeof err === 'object') {
+        if (err instanceof Error) {
+            return this.reject(ret);
+        }
+        return this.reject(Object.assign(new Error(err.message), { errCode: err.errCode }));
+    } else if (typeof err === 'string') {
+        return this.reject(new Error(err));
+    }
+    this.reject(Object.assign(new Error(), { origin: err }));
 }
 
-function translateError(e){
-  if (typeof(e) === 'object'){
-    if(e instanceof  Error)
-    {
-      throw e;
+function wrapApi(nativeFunc) {
+    if (!nativeFunc) {
+        return undefined;
     }
-    else {
-      let error = new Error(e.errMsg || "login error")
-      error.code = e.err
-      throw error;
-    }
-  }
-  else {
-    throw new Error("unkown qq login error")
-  }
+    const promisified = promisify(nativeFunc, translateError);
+    return (...args) => {
+        return promisified(...args);
+    };
 }
 
-export function login(scopes){
-  return new Promise((resolve, reject)=>{
-    nativeQQAPI.login(scopes, resolve, reject)
-  }).catch(translateError)
+// Save callback and wait for future event.
+let savedCallback = undefined;
+function waitForResponse(type) {
+    return new Promise((resolve, reject) => {
+        if (savedCallback) {
+            savedCallback('User canceled.');
+        }
+        savedCallback = result => {
+            if (result.type !== type) {
+                return;
+            }
+            savedCallback = undefined;
+            if (result.errCode !== 0) {
+                const err = new Error(result.errMsg);
+                err.errCode = result.errCode;
+                reject(err);
+            } else {
+                const {type, ...r} = result
+                resolve(r);
+            }
+        };
+    });
+}
+
+NativeAppEventEmitter.addListener('QQ_Resp', resp => {
+    const callback = savedCallback;
+    savedCallback = undefined;
+    callback && callback(resp);
+});
+
+const nativeSendAuthRequest = wrapApi(QQAPI.login);
+const nativeShareToQQRequest = wrapApi(QQAPI.shareToQQ);
+const nativeShareToQzoneRequest = wrapApi(QQAPI.shareToQzone);
+
+
+export function login(scopes) {
+    return nativeSendAuthRequest(scopes)
+        .then(() => waitForResponse("QQAuthorizeResponse"));
+}
+
+export function shareToQQ(data={}) {
+    return nativeShareToQQRequest(data)
+        .then(() => waitForResponse("QQShareResponse"));
+}
+
+export function shareToQzone(data={}) {
+    return nativeShareToQzoneRequest(data)
+        .then(() => waitForResponse("QQShareResponse"));
 }
 
 export function logout(){
-  nativeQQAPI.logout()
+    QQAPI.logout()
 }
 
-export function shareToQQ(data){
-  return new Promise((resolve, reject)=>{
-    nativeQQAPI.shareToQQ(data, resolve, reject);
-  }).catch(translateError)
-}
-
-export function shareToQzone(data){
-  return new Promise((resolve, reject)=>{
-    nativeQQAPI.shareToQzone(data, resolve, reject);
-  }).catch(translateError)
-}
 
 
 

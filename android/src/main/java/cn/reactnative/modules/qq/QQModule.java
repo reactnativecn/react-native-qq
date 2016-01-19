@@ -1,6 +1,5 @@
 package cn.reactnative.modules.qq;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -11,11 +10,11 @@ import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.RCTNativeAppEventEmitter;
 import com.tencent.connect.common.Constants;
 import com.tencent.connect.share.QQShare;
 import com.tencent.tauth.IUiListener;
@@ -24,7 +23,6 @@ import com.tencent.tauth.UiError;
 
 import org.json.JSONObject;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -34,6 +32,22 @@ import java.util.Date;
 public class QQModule extends ReactContextBaseJavaModule implements IUiListener, ActivityEventListener {
     private String appId;
     private Tencent api;
+    private final static String INVOKE_FAILED = "WeChat API invoke returns false.";
+    private boolean isLogin;
+    
+    private static final String RCTQQShareTypeNews = "news";
+    private static final String RCTQQShareTypeImage = "image";
+    private static final String RCTQQShareTypeText = "text";
+    private static final String RCTQQShareTypeVideo = "video";
+    private static final String RCTQQShareTypeAudio = "audio";
+
+    private static final String RCTQQShareType = "type";
+    private static final String RCTQQShareText = "text";
+    private static final String RCTQQShareTitle = "title";
+    private static final String RCTQQShareDescription = "description";
+    private static final String RCTQQShareWebpageUrl = "webpageUrl";
+    private static final String RCTQQShareImageUrl = "imageUrl";
+
     public QQModule(ReactApplicationContext context) {
         super(context);
         ApplicationInfo appInfo = null;
@@ -46,24 +60,27 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
             throw new Error("meta-data QQ_APPID not found in AndroidManifest.xml");
         }
         this.appId = appInfo.metaData.get("QQ_APPID").toString();
-
-        context.addActivityEventListener(this);
     }
 
-    private Activity getMainActivity(){
-        ReactContext context = getReactApplicationContext();
-        Field[] fields = ReactContext.class.getDeclaredFields();
-        for (Field field : fields){
-            if (field.getName().equals("mCurrentActivity")){
-                field.setAccessible(true);
-                try {
-                    return (Activity)field.get(context);
-                }catch (Throwable e){
-                    Log.e("ReactNative", e.getMessage(), e);
-                }
-            }
+    @Override
+    public void initialize() {
+        super.initialize();
+
+        if (api == null) {
+            api = Tencent.createInstance(appId, getReactApplicationContext().getApplicationContext());
         }
-        return null;
+        getReactApplicationContext().addActivityEventListener(this);
+    }
+
+    @Override
+    public void onCatalystInstanceDestroy() {
+
+        if (api != null){
+            api = null;
+        }
+        getReactApplicationContext().removeActivityEventListener(this);
+
+        super.onCatalystInstanceDestroy();
     }
 
     @Override
@@ -72,47 +89,45 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
     }
 
     @ReactMethod
-    public void login(String scopes, Callback resolve, Callback reject){
-        _setCallback(new PromiseCallback(resolve, reject));
+    public void login(String scopes, Callback callback){
+        this.isLogin = true;
         if (!api.isSessionValid()){
-            api.login(getMainActivity(), scopes == null ? "get_simple_userinfo" : scopes, this);
+            api.login(getCurrentActivity(), scopes == null ? "get_simple_userinfo" : scopes, this);
+            callback.invoke();
         } else {
-            _resolve();
+            callback.invoke(INVOKE_FAILED);
         }
     }
 
     @ReactMethod
-    public void shareToQQ(ReadableMap data, Callback resolve, Callback reject){
-        _setCallback(new PromiseCallback(resolve, reject));
-
-        _shareToQQ(data, 0);
+    public void shareToQQ(ReadableMap data, Callback callback){
+        _shareToQQ(data, 0, callback);
     }
 
     @ReactMethod
-    public void shareToQzone(ReadableMap data, Callback resolve, Callback reject){
-        _setCallback(new PromiseCallback(resolve, reject));
-
-        _shareToQQ(data, 1);
+    public void shareToQzone(ReadableMap data, Callback callback){
+        _shareToQQ(data, 1, callback);
     }
 
-    private void _shareToQQ(ReadableMap data, int scene) {
+    private void _shareToQQ(ReadableMap data, int scene, Callback callback) {
+        this.isLogin = false;
         Bundle bundle = new Bundle();
-        if (data.hasKey("title")){
-            bundle.putString(QQShare.SHARE_TO_QQ_TITLE, data.getString("title"));
+        if (data.hasKey(RCTQQShareTitle)){
+            bundle.putString(QQShare.SHARE_TO_QQ_TITLE, data.getString(RCTQQShareTitle));
         }
-        if (data.hasKey("description")){
-            bundle.putString(QQShare.SHARE_TO_QQ_SUMMARY, data.getString("description"));
+        if (data.hasKey(RCTQQShareDescription)){
+            bundle.putString(QQShare.SHARE_TO_QQ_SUMMARY, data.getString(RCTQQShareDescription));
         }
-        if (data.hasKey("webpageUrl")){
-            bundle.putString(QQShare.SHARE_TO_QQ_TARGET_URL, data.getString("webpageUrl"));
+        if (data.hasKey(RCTQQShareWebpageUrl)){
+            bundle.putString(QQShare.SHARE_TO_QQ_TARGET_URL, data.getString(RCTQQShareWebpageUrl));
         }
-        if (data.hasKey("imageUrl")){
+        if (data.hasKey(RCTQQShareImageUrl)){
             if (scene == 0) {
-                bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, data.getString("imageUrl"));
+                bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, data.getString(RCTQQShareImageUrl));
             }
             else if (scene == 1) {
                 ArrayList<String> out = new ArrayList<>();
-                out.add(data.getString("imageUrl"));
+                out.add(data.getString(RCTQQShareImageUrl));
                 bundle.putStringArrayList(QQShare.SHARE_TO_QQ_IMAGE_URL, out);
             }
         }
@@ -120,42 +135,36 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
             bundle.putString(QQShare.SHARE_TO_QQ_APP_NAME, data.getString("appName"));
         }
 
-        if (!data.hasKey("type") || data.getString("type").equals("news")){
-            bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
-        } else if (data.getString("type").equals("image")){
-            bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE);
+        String type = RCTQQShareTypeNews;
+        if (data.hasKey(RCTQQShareType)) {
+            type = data.getString(RCTQQShareType);
+        }
 
-        } else if (data.getString("type").equals("audio")) {
+        if (type.equals(RCTQQShareTypeNews)){
+            bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
+        } else if (type.equals(RCTQQShareTypeImage)){
+            bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE);
+        } else if (type.equals(RCTQQShareTypeAudio)) {
             bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_AUDIO);
             if (data.hasKey("flashUrl")){
                 bundle.putString(QQShare.SHARE_TO_QQ_AUDIO_URL, data.getString("flashUrl"));
             }
-        } else if (data.getString("type").equals("app")){
+        } else if (type.equals("app")){
             bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_APP);
         }
 
+        Log.e("QQShare", bundle.toString());
         if (scene == 0 ) {
-            api.shareToQQ(getMainActivity(), bundle, this);
+            api.shareToQQ(getCurrentActivity(), bundle, this);
         }
         else if (scene == 1) {
-            api.shareToQzone(getMainActivity(), bundle, this);
+            api.shareToQzone(getCurrentActivity(), bundle, this);
         }
+        callback.invoke();
     }
 
-    @Override
-    public void initialize() {
-        if (api == null) {
-            api = Tencent.createInstance(appId, getReactApplicationContext().getApplicationContext());
-        }
-        super.initialize();
-    }
-
-    @Override
-    public void onCatalystInstanceDestroy() {
-        if (api != null){
-            api = null;
-        }
-        super.onCatalystInstanceDestroy();
+    private String _getType() {
+        return (this.isLogin?"QQAuthorizeResponse":"QQShareResponse");
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -166,20 +175,30 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
     public void onComplete(Object o) {
         try {
             JSONObject obj = (JSONObject)(o);
-//            Log.e("QQModule", obj.toString());
 
             WritableMap map = Arguments.createMap();
-            map.putString("openid", obj.getString("openid"));
-            map.putString("access_token", obj.getString("access_token"));
-            map.putString("oauth_consumer_key", this.appId);
-            map.putDouble("expires_in", (new Date().getTime() + obj.getLong("expires_in")));
+            map.putInt("errCode", 0);
+            if (isLogin) {
+                map.putString("openid", obj.getString(Constants.PARAM_OPEN_ID));
+                map.putString("access_token", obj.getString(Constants.PARAM_ACCESS_TOKEN));
+                map.putString("oauth_consumer_key", this.appId);
+                map.putDouble("expires_in", (new Date().getTime() + obj.getLong(Constants.PARAM_EXPIRES_IN)));
+                map.putString("type", _getType());
+            }
 
-            _resolve(map);
+            getReactApplicationContext()
+                    .getJSModule(RCTNativeAppEventEmitter.class)
+                    .emit("QQ_Resp", map);
+
         } catch (Exception e){
             WritableMap map = Arguments.createMap();
-            map.putInt("err", Constants.ERROR_UNKNOWN);
+            map.putInt("errCode", Constants.ERROR_UNKNOWN);
             map.putString("errMsg", e.getLocalizedMessage());
-            _reject(map);
+            map.putString("type", _getType());
+
+            getReactApplicationContext()
+                    .getJSModule(RCTNativeAppEventEmitter.class)
+                    .emit("QQ_Resp", map);
         }
     }
 
@@ -188,54 +207,22 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
         WritableMap map = Arguments.createMap();
         map.putInt("err", uiError.errorCode);
         map.putString("errMsg", uiError.errorMessage);
-        map.putString("errDetail", uiError.errorDetail);
-        _reject(map);
+        map.putString("type", _getType());
+
+        getReactApplicationContext()
+                .getJSModule(RCTNativeAppEventEmitter.class)
+                .emit("QQ_Resp", map);
     }
 
     @Override
     public void onCancel() {
         WritableMap map = Arguments.createMap();
-        map.putInt("err", -1001);
+        map.putInt("err", -1);
         map.putString("errMsg", "Canceled.");
-        _reject(map);
-    }
+        map.putString("type", _getType());
 
-    private class PromiseCallback{
-        private PromiseCallback(Callback resolve, Callback reject){
-            this.resolve = resolve;
-            this.reject = reject;
-        }
-        private Callback resolve;
-        private Callback reject;
-    }
-    private PromiseCallback callback;
-
-    private void _setCallback(PromiseCallback callback){
-        if (this.callback != null){
-            WritableMap event = Arguments.createMap();
-            event.putInt("err", Constants.ERROR_UNKNOWN);
-            _reject(event);
-        }
-        this.callback = callback;
-    }
-    private void _reject(WritableMap event){
-        if (callback != null){
-            callback.reject.invoke(event);
-            callback = null;
-        }
-    }
-
-    private void _resolve(){
-        if (callback != null){
-            callback.resolve.invoke();
-            callback = null;
-        }
-    }
-
-    private void _resolve(Object event){
-        if (callback != null){
-            callback.resolve.invoke(event);
-            callback = null;
-        }
+        getReactApplicationContext()
+                .getJSModule(RCTNativeAppEventEmitter.class)
+                .emit("WeChat_Resp", map);
     }
 }

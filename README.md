@@ -108,6 +108,8 @@ import * as QQAPI from 'react-native-qq';
 
 #### QQAPI.login([scopes])
 
+- scopes: 登录所申请的权限，默认为get_simple_userinfo。 需要多个权限时，以逗号分隔。
+
 调用QQ登录，可能会跳转到QQ应用或者打开一个网页浏览器以供用户登录。在本次login返回前，所有接下来的login调用都会直接失败。
 
 返回一个`Promise`对象。成功时的回调为一个类似这样的对象：

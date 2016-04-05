@@ -12,7 +12,7 @@ npm install react-native-qq --save
 ### 安装iOS工程
 将`node_modules/react-native-qq/ios/RCTQQAPI.xcodeproj`加入到工程中
 
-在工程target的`Build Phases->Link Binary with Libraries`中加入`libRCTQQAPI.a、libiconv.tbd、libsqlite3.tbd、liz.tbd、libc++.tbd`
+在工程target的`Build Phases->Link Binary with Libraries`中加入`libRCTQQAPI.a、libiconv.tbd、libsqlite3.tbd、libz.tbd、libc++.tbd`
 
 在 `Build Settings->Search Paths->Framework Search Paths` 中加入路径 `$(SRCROOT)/../node_modules/react-native-qq/ios/RCTQQAPI`
 

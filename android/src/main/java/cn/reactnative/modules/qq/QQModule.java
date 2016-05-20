@@ -32,9 +32,9 @@ import java.util.Date;
 public class QQModule extends ReactContextBaseJavaModule implements IUiListener, ActivityEventListener {
     private String appId;
     private Tencent api;
-    private final static String INVOKE_FAILED = "WeChat API invoke returns false.";
+    private final static String INVOKE_FAILED = "QQ API invoke returns false.";
     private boolean isLogin;
-    
+
     private static final String RCTQQShareTypeNews = "news";
     private static final String RCTQQShareTypeImage = "image";
     private static final String RCTQQShareTypeText = "text";
@@ -178,12 +178,12 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
 
             WritableMap map = Arguments.createMap();
             map.putInt("errCode", 0);
+            map.putString("type", _getType());
             if (isLogin) {
                 map.putString("openid", obj.getString(Constants.PARAM_OPEN_ID));
                 map.putString("access_token", obj.getString(Constants.PARAM_ACCESS_TOKEN));
                 map.putString("oauth_consumer_key", this.appId);
                 map.putDouble("expires_in", (new Date().getTime() + obj.getLong(Constants.PARAM_EXPIRES_IN)));
-                map.putString("type", _getType());
             }
 
             getReactApplicationContext()
@@ -223,6 +223,6 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
 
         getReactApplicationContext()
                 .getJSModule(RCTNativeAppEventEmitter.class)
-                .emit("WeChat_Resp", map);
+                .emit("QQ_Resp", map);
     }
 }

@@ -16,7 +16,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="${QQ_APPID}" />
+                <data android:scheme="tencent${QQ_APPID}" />
             </intent-filter>
         </activity>
         <activity android:name="com.tencent.connect.common.AssistActivity"

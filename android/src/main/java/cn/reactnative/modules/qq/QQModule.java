@@ -174,7 +174,7 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
     }
 
     @Override
-    public void onComplete() {
+    public void onComplete(Object o) {
         WritableMap resultMap = Arguments.createMap();
         resultMap.putInt("code", SHARE_RESULT_CODE_SUCCESSFUL);
         resultMap.putString("message", "Share successfully.");

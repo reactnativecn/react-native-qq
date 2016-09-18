@@ -21,6 +21,20 @@ function translateError(err, result) {
     this.reject(Object.assign(new Error(), { origin: err }));
 }
 
+function wrapCheckApi(nativeFunc) {
+    if (!nativeFunc) {
+        return undefined;
+    }
+
+    const promisified = promisify(nativeFunc, translateError);
+    return (...args) => {
+        return promisified(...args);
+    };
+}
+
+export const isQQInstalled = wrapCheckApi(QQAPI.isQQInstalled);
+export const isQQSupportApi = wrapCheckApi(QQAPI.isQQSupportApi);
+
 function wrapApi(nativeFunc) {
     if (!nativeFunc) {
         return undefined;

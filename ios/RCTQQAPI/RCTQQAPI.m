@@ -63,6 +63,15 @@ RCT_EXPORT_MODULE();
     }
 }
 
+RCT_EXPORT_METHOD(isQQInstalled:(RCTResponseSenderBlock)callback)
+{
+    callback(@[[NSNull null], @([QQApiInterface isQQInstalled])]);
+}
+
+RCT_EXPORT_METHOD(isQQSupportApi:(RCTResponseSenderBlock)callback)
+{
+    callback(@[[NSNull null], @([QQApiInterface isQQSupportApi])]);
+}
 
 RCT_EXPORT_METHOD(login:(NSString *)scopes callback:(RCTResponseSenderBlock)callback)
 {

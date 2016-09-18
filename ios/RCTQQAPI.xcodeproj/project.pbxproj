@@ -28,7 +28,6 @@
 		9139321C1C232D310085E3BA /* libRCTQQAPI.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRCTQQAPI.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		9139321F1C232D310085E3BA /* RCTQQAPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTQQAPI.h; sourceTree = "<group>"; };
 		913932211C232D310085E3BA /* RCTQQAPI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTQQAPI.m; sourceTree = "<group>"; };
-		9139323F1C232ED60085E3BA /* TencentOpenApi_IOS_Bundle.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = TencentOpenApi_IOS_Bundle.bundle; sourceTree = "<group>"; };
 		913932401C232ED60085E3BA /* TencentOpenAPI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TencentOpenAPI.framework; sourceTree = "<group>"; };
 		9139325C1C233E370085E3BA /* RCTQQAPI.debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = RCTQQAPI.debug.xcconfig; sourceTree = "<group>"; };
 		9139325D1C233E480085E3BA /* RCTQQAPI.release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = RCTQQAPI.release.xcconfig; sourceTree = "<group>"; };
@@ -66,7 +65,6 @@
 		9139321E1C232D310085E3BA /* RCTQQAPI */ = {
 			isa = PBXGroup;
 			children = (
-				9139323F1C232ED60085E3BA /* TencentOpenApi_IOS_Bundle.bundle */,
 				913932401C232ED60085E3BA /* TencentOpenAPI.framework */,
 				9139321F1C232D310085E3BA /* RCTQQAPI.h */,
 				913932211C232D310085E3BA /* RCTQQAPI.m */,

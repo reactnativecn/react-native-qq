@@ -89,6 +89,26 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
     public String getName() {
         return "RCTQQAPI";
     }
+    
+    @ReactMethod
+    public void isQQInstalled(Promise promise) {
+        if (api.isSupportSSOLogin(getCurrentActivity())) {
+            promise.resolve(true);
+        }
+        else {
+            promise.reject("not installed");
+        }
+    }
+    
+    @ReactMethod
+    public void isQQSupportApi(Promise promise) {
+        if (api.isSupportSSOLogin(getCurrentActivity())) {
+            promise.resolve(true);
+        }
+        else {
+            promise.reject("not support");
+        }
+    }
 
     @ReactMethod
     public void login(String scopes, Promise promise){

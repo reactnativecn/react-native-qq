@@ -2,7 +2,6 @@
  * Created by Yun on 2015-12-12.
  */
 import {NativeModules, NativeAppEventEmitter} from 'react-native';
-import promisify from 'es6-promisify';
 
 const {QQAPI} = NativeModules;
 
@@ -21,29 +20,8 @@ function translateError(err, result) {
     this.reject(Object.assign(new Error(), { origin: err }));
 }
 
-function wrapCheckApi(nativeFunc) {
-    if (!nativeFunc) {
-        return undefined;
-    }
-
-    const promisified = promisify(nativeFunc, translateError);
-    return (...args) => {
-        return promisified(...args);
-    };
-}
-
-export const isQQInstalled = wrapCheckApi(QQAPI.isQQInstalled);
-export const isQQSupportApi = wrapCheckApi(QQAPI.isQQSupportApi);
-
-function wrapApi(nativeFunc) {
-    if (!nativeFunc) {
-        return undefined;
-    }
-    const promisified = promisify(nativeFunc, translateError);
-    return (...args) => {
-        return promisified(...args);
-    };
-}
+export const isQQInstalled = QQAPI.isQQInstalled;
+export const isQQSupportApi = QQAPI.isQQSupportApi;
 
 // Save callback and wait for future event.
 let savedCallback = undefined;
@@ -75,23 +53,18 @@ NativeAppEventEmitter.addListener('QQ_Resp', resp => {
     callback && callback(resp);
 });
 
-const nativeSendAuthRequest = wrapApi(QQAPI.login);
-const nativeShareToQQRequest = wrapApi(QQAPI.shareToQQ);
-const nativeShareToQzoneRequest = wrapApi(QQAPI.shareToQzone);
-
-
 export function login(scopes) {
-    return nativeSendAuthRequest(scopes)
+    return QQAPI.login(scopes)
         .then(() => waitForResponse("QQAuthorizeResponse"));
 }
 
 export function shareToQQ(data={}) {
-    return nativeShareToQQRequest(data)
+    return QQAPI.shareToQQ(data)
         .then(() => waitForResponse("QQShareResponse"));
 }
 
 export function shareToQzone(data={}) {
-    return nativeShareToQzoneRequest(data)
+    return QQAPI.shareToQzone(data)
         .then(() => waitForResponse("QQShareResponse"));
 }
 

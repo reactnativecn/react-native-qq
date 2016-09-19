@@ -63,17 +63,27 @@ RCT_EXPORT_MODULE();
     }
 }
 
-RCT_EXPORT_METHOD(isQQInstalled:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(isQQInstalled:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 {
-    callback(@[[NSNull null], @([QQApiInterface isQQInstalled])]);
+    if ([QQApiInterface isQQInstalled]) {
+        resolve(@[[NSNull null]]);
+    }
+    else {
+        reject(@"-1",INVOKE_FAILED,nil);
+    }
 }
 
-RCT_EXPORT_METHOD(isQQSupportApi:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(isQQSupportApi:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 {
-    callback(@[[NSNull null], @([QQApiInterface isQQSupportApi])]);
+    if ([QQApiInterface isQQSupportApi]) {
+        resolve(@[[NSNull null]]);
+    }
+    else {
+        reject(@"-1",INVOKE_FAILED,nil);
+    }
 }
 
-RCT_EXPORT_METHOD(login:(NSString *)scopes callback:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(login:(NSString *)scopes resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 {
     NSArray *scopeArray = nil;
     if (scopes && scopes.length) {
@@ -83,17 +93,22 @@ RCT_EXPORT_METHOD(login:(NSString *)scopes callback:(RCTResponseSenderBlock)call
         scopeArray = @[@"get_user_info", @"get_simple_userinfo"];
     }
     BOOL success = [_qqapi authorize:scopeArray];
-    callback(@[success ? [NSNull null] : INVOKE_FAILED]);
+    if (success) {
+        resolve(@[[NSNull null]]);
+    }
+    else {
+        reject(@"-1",INVOKE_FAILED,nil);
+    }
 }
 
-RCT_EXPORT_METHOD(shareToQQ:(NSDictionary *)data callback:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(shareToQQ:(NSDictionary *)data resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 {
-    [self _shareToQQWithData:data scene:0 callback:callback];
+    [self _shareToQQWithData:data scene:0 resolve:resolve reject:reject];
 }
 
-RCT_EXPORT_METHOD(shareToQzone:(NSDictionary *)data callback:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(shareToQzone:(NSDictionary *)data resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 {
-    [self _shareToQQWithData:data scene:1 callback:callback];
+    [self _shareToQQWithData:data scene:1 resolve:resolve reject:reject];
 }
 
 RCT_EXPORT_METHOD(logout)
@@ -101,7 +116,7 @@ RCT_EXPORT_METHOD(logout)
     [_qqapi logout:nil];
 }
 
-- (void)_shareToQQWithData:(NSDictionary *)aData scene:(int)aScene callback:(RCTResponseSenderBlock)aCallBack
+- (void)_shareToQQWithData:(NSDictionary *)aData scene:(int)aScene resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
 {
     NSString *type = aData[RCTQQShareType];
     
@@ -166,13 +181,13 @@ RCT_EXPORT_METHOD(logout)
     }
     
     if (sent == EQQAPISENDSUCESS) {
-        aCallBack(@[[NSNull null]]);
+        resolve(@[[NSNull null]]);
     }
     else if (sent == EQQAPIAPPSHAREASYNC) {
-        aCallBack(@[[NSNull null]]);
+        resolve(@[[NSNull null]]);
     }
     else {
-        aCallBack(@[INVOKE_FAILED]);
+        reject(@"-1",INVOKE_FAILED,nil);
     }
 }
 

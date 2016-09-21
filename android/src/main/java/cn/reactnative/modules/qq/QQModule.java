@@ -1,5 +1,6 @@
 package cn.reactnative.modules.qq;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -190,6 +191,11 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Tencent.onActivityResultData(requestCode, resultCode, data, this);
+    }
+	
+	// if react-native version>=0.33.0,need override this method
+    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
         Tencent.onActivityResultData(requestCode, resultCode, data, this);
     }
 

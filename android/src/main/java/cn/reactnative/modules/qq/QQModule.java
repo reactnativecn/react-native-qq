@@ -53,6 +53,7 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
 
     public QQModule(ReactApplicationContext context) {
         super(context);
+		context.addActivityEventListener(this);
         ApplicationInfo appInfo = null;
         try {
             appInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
@@ -190,6 +191,7 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
         return (this.isLogin?"QQAuthorizeResponse":"QQShareResponse");
     }
 
+	@Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Tencent.onActivityResultData(requestCode, resultCode, data, this);
     }
@@ -202,8 +204,7 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
     @Override
     public void onComplete(Object o) {
         WritableMap resultMap = Arguments.createMap();
-        resultMap.putInt("code", SHARE_RESULT_CODE_SUCCESSFUL);
-        resultMap.putString("message", "Share successfully.");
+        resultMap.putString("result", o.toString());
 
         this.resolvePromise(resultMap);
     }

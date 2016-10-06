@@ -116,19 +116,38 @@ RCT_EXPORT_METHOD(logout)
     [_qqapi logout:nil];
 }
 
-- (void)_shareToQQWithData:(NSDictionary *)aData scene:(int)aScene resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
-{
+- (void)_shareToQQWithData:(NSDictionary *)aData scene:(int)aScene resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject{
+    NSString *imageUrl = aData[RCTQQShareImageUrl];
+    if (imageUrl.length && _bridge.imageLoader) {
+        CGSize size = CGSizeZero;
+        if (![aData[RCTQQShareType] isEqualToString:RCTQQShareTypeImage]) {
+            CGFloat thumbImageSize = 80;
+            size = CGSizeMake(thumbImageSize,thumbImageSize);
+        }
+        [_bridge.imageLoader loadImageWithTag:imageUrl size:size scale:1 resizeMode:UIViewContentModeScaleToFill progressBlock:nil completionBlock:^(NSError *error, UIImage *image) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self _shareToQQWithData:aData image:image scene:aScene resolve:resolve reject:reject];
+            });
+        }];
+    }
+    else {
+        [self _shareToQQWithData:aData image:nil scene:aScene resolve:resolve reject:reject];
+    }
+}
+
+
+- (void)_shareToQQWithData:(NSDictionary *)aData image:(UIImage*) image scene:(int)aScene resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
     NSString *type = aData[RCTQQShareType];
-    
+
     NSString *title = aData[RCTQQShareTitle];
-    
+
     NSString *description= aData[RCTQQShareDescription];
     NSString *imgPath = aData[RCTQQShareImageUrl];
     NSString *webpageUrl = aData[RCTQQShareWebpageUrl]? :@"";
     NSString *flashUrl = aData[@"flashUrl"];
-    
+
     QQApiObject *message = nil;
-    
+
     if (type.length <=0 || [type isEqualToString: RCTQQShareTypeNews]) {
         message = [QQApiNewsObject
                    objectWithURL:[NSURL URLWithString:webpageUrl]
@@ -140,7 +159,7 @@ RCT_EXPORT_METHOD(logout)
         message = [QQApiTextObject objectWithText:description];
     }
     else if ([type isEqualToString: RCTQQShareTypeImage]) {
-        NSData *imgData = [NSData dataWithContentsOfFile:imgPath];
+        NSData *imgData = UIImageJPEGRepresentation(image, 1.0f);
         message = [QQApiImageObject objectWithData:imgData
                                   previewImageData:imgData
                                              title:title
@@ -166,9 +185,9 @@ RCT_EXPORT_METHOD(logout)
         }
         message = videoObj;
     }
-    
+
     QQApiSendResultCode sent = EQQAPISENDFAILD;
-    
+
     if (message != nil) {
         SendMessageToQQReq *req = [SendMessageToQQReq reqWithContent:message];
         if (aScene == 0) {
@@ -179,7 +198,7 @@ RCT_EXPORT_METHOD(logout)
         }
         sent = [QQApiInterface sendReq:req];
     }
-    
+
     if (sent == EQQAPISENDSUCESS) {
         resolve(@[[NSNull null]]);
     }

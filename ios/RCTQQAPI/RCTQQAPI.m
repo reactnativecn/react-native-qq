@@ -159,7 +159,7 @@ RCT_EXPORT_METHOD(logout)
         message = [QQApiTextObject objectWithText:description];
     }
     else if ([type isEqualToString: RCTQQShareTypeImage]) {
-        NSData *imgData = UIImageJPEGRepresentation(image, 1.0f);
+        NSData *imgData = UIImageJPEGRepresentation(image, 1);
         message = [QQApiImageObject objectWithData:imgData
                                   previewImageData:imgData
                                              title:title
@@ -196,7 +196,6 @@ RCT_EXPORT_METHOD(logout)
         else {
             sent = [QQApiInterface SendReqToQZone:req];
         }
-        sent = [QQApiInterface sendReq:req];
     }
 
     if (sent == EQQAPISENDSUCESS) {

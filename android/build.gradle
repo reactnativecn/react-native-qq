@@ -15,8 +15,15 @@ android {
   }
 }
 
+repositories {
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        url "$rootDir/../node_modules/react-native/android"
+    }
+}
+
 dependencies {
-  compile 'com.facebook.react:react-native:0.17.+'
+  compile 'com.facebook.react:react-native:+'
   compile files('libs/mta-sdk-1.6.2.jar')
   compile files('libs/open_sdk_r5756.jar')
 }

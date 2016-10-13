@@ -195,6 +195,10 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
         Tencent.onActivityResultData(requestCode, resultCode, data, this);
     }
 
+    public void onNewIntent(Intent intent){
+
+    }
+
     @Override
     public void onComplete(Object o) {
         WritableMap resultMap = Arguments.createMap();

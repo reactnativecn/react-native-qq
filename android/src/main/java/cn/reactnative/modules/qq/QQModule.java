@@ -5,6 +5,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.app.Activity;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
@@ -190,7 +191,7 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
         return (this.isLogin?"QQAuthorizeResponse":"QQShareResponse");
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
         Tencent.onActivityResultData(requestCode, resultCode, data, this);
     }
 

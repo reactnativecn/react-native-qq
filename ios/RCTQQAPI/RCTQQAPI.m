@@ -124,7 +124,9 @@ RCT_EXPORT_METHOD(logout)
             CGFloat thumbImageSize = 80;
             size = CGSizeMake(thumbImageSize,thumbImageSize);
         }
-        [_bridge.imageLoader loadImageWithURLRequest:imageUrl callback:^(NSError *error, UIImage *image) {
+        NSURL *url = [NSURL URLWithString:imageUrl];
+        NSURLRequest *imageRequest = [NSURLRequest requestWithURL:url];
+        [_bridge.imageLoader loadImageWithURLRequest:imageRequest size:size scale:1 clipped:FALSE resizeMode:RCTResizeModeStretch progressBlock:nil partialLoadBlock:nil completionBlock:^(NSError *error, UIImage *image) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self _shareToQQWithData:aData image:image scene:aScene resolve:resolve reject:reject];
             });

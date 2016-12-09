@@ -73,17 +73,34 @@ dependencies{
 
 以后如果需要修改APPID，只需要修改此一处。
 
-
-`android/app/src/main/java/<你的包名>/MainActivity.java`中，`public class MainActivity`之前增加：
-
-```java
-import cn.reactnative.modules.qq.QQPackage;
-```
-
-`.addPackage(new MainReactPackage())`之后增加：
+`android/app/src/main/java/<你的包名>/MainApplication.java`中添加如下两行：
 
 ```java
-                .addPackage(new QQPackage())
+...
+import cn.reactnative.modules.qq.QQPackage;  // 在public class MainApplication之前import
+
+public class MainApplication extends Application implements ReactApplication {
+
+  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+    @Override
+    protected boolean getUseDeveloperSupport() {
+      return BuildConfig.DEBUG;
+    }
+
+    @Override
+    protected List<ReactPackage> getPackages() {
+      return Arrays.<ReactPackage>asList(
+          new QQPackage(), // 然后添加这一行
+          new MainReactPackage()
+      );
+    }
+  };
+
+  @Override
+  public ReactNativeHost getReactNativeHost() {
+      return mReactNativeHost;
+  }
+}
 ```
 
 另外，确保你的MainActivity.java中有`onActivityResult`的实现：

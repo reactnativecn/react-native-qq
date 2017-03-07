@@ -11,10 +11,18 @@
 #import <TencentOpenAPI/TencentOAuthObject.h>
 #import <TencentOpenAPI/QQApiInterface.h>
 #import <TencentOpenAPI/QQApiInterfaceObject.h>
-#import "RCTImageLoader.h"
-#import "RCTBridge.h"
+
+#if __has_include(<React/RCTBridge.h>)
+#import <React/RCTLog.h>
+#import <React/RCTBridge.h>
+#import <React/RCTEventDispatcher.h>
+#import <React/RCTImageLoader.h>
+#else
 #import "RCTLog.h"
 #import "RCTEventDispatcher.h"
+#import "RCTBridge.h"
+#import "RCTImageLoader.h"
+#endif
 
 //#define NOT_REGISTERED (@"registerApp required.")
 #define INVOKE_FAILED (@"QQ API invoke returns false.")

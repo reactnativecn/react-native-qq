@@ -229,6 +229,7 @@
 					"$(SRCROOT)/../../react-native/React/**",
 					"$(SRCROOT)/../../react-native/Libraries/**",
 					"$(SRCROOT)/RCTQQAPI/**",
+					"$(BUILT_PRODUCTS_DIR)/include",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -250,6 +251,7 @@
 					"$(SRCROOT)/../../react-native/React/**",
 					"$(SRCROOT)/../../react-native/Libraries/**",
 					"$(SRCROOT)/RCTQQAPI/**",
+					"$(BUILT_PRODUCTS_DIR)/include",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";

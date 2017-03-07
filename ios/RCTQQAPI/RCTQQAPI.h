@@ -6,8 +6,11 @@
 //  Copyright © 2015 erica. All rights reserved.
 //
 
+#if __has_include(<React/RCTBridge.h>)
+#import <React/RCTBridgeModule.h>
+#else
 #import "RCTBridgeModule.h"
-
+#endif
 
 #define RCTQQShareTypeNews @"news"
 #define RCTQQShareTypeImage @"image"

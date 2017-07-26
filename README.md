@@ -7,30 +7,68 @@ React Native的QQ登录插件, react-native版本需要0.33.0及以上
 ### 首先安装npm包
 
 ```bash
+yarn add react-native-qq
+```
+或
+
+```bash
 npm install react-native-qq --save
 ```
+
+然后执行
+
+```bash
+react-native link react-native-qq
+```
+
 ### 安装iOS工程
-将`node_modules/react-native-qq/ios/RCTQQAPI.xcodeproj`加入到工程中
 
 在工程target的`Build Phases->Link Binary with Libraries`中加入`libRCTQQAPI.a、libiconv.tbd、libsqlite3.tbd、libz.tbd、libc++.tbd`
 
-在 `Build Settings->Search Paths->Framework Search Paths` 中加入路径 `$(SRCROOT)/../node_modules/react-native-qq/ios/RCTQQAPI`
+在 `Build Settings->Search Paths->Framework Search Paths`（如果你找不到Framework Search Paths，请注意选择Build Settings下方的All，而不是Basic） 中加入路径 `$(SRCROOT)/../node_modules/react-native-qq/ios/RCTQQAPI`
 
 在 `Build Settings->Link->Other Linker Flags` 中加入 `-framework "TencentOpenAPI"`
 
-在 `Apple LLVM 7.0 - Custom Compiler Flags->Link->Other C Flags`中加入 `-isystem "$(SRCROOT)/../node_modules/react-native-qq/ios/RCTQQAPI"`
+在 `Apple LLVM X.X - Custom Compiler Flags->Link->Other C Flags`中加入 `-isystem "$(SRCROOT)/../node_modules/react-native-qq/ios/RCTQQAPI"`
 
 在工程plist文件中加入qq白名单：(ios9以上必须)
-如果plist中没有 `LSApplicationQueriesSchemes`项，请先添加该项，Type设置为Array。接着，在`LSApplicationQueriesSchemes`中添加子项：`mqqapi、mqq、mqqOpensdkSSoLogin、mqqconnect、mqqopensdkdataline、mqqopensdkgrouptribeshare、mqqopensdkfriend、mqqopensdkapi、mqqopensdkapiV2、mqqopensdkapiV3、mqzoneopensdk、wtloginmqq、wtloginmqq2、mqqwpa、mqzone、mqzonev2、mqzoneshare、wtloginqzone、mqzonewx、
-mqzoneopensdkapiV2、mqzoneopensdkapi19、mqzoneopensdkapi、mqzoneopensdk、`
+请以文本方式打开Info.plist，在其中添加
+```xml
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <!-- QQ、Qzone URL Scheme 白名单-->
+    <string>mqqapi</string>
+    <string>mqq</string>
+    <string>mqqOpensdkSSoLogin</string>
+    <string>mqqconnect</string>
+    <string>mqqopensdkdataline</string>
+    <string>mqqopensdkgrouptribeshare</string>
+    <string>mqqopensdkfriend</string>
+    <string>mqqopensdkapi</string>
+    <string>mqqopensdkapiV2</string>
+    <string>mqqopensdkapiV3</string>
+    <string>mqzoneopensdk</string>
+    <string>wtloginmqq</string>
+    <string>wtloginmqq2</string>
+    <string>mqqwpa</string>
+    <string>mqzone</string>
+    <string>mqzonev2</string>
+    <string>mqzoneshare</string>
+    <string>wtloginqzone</string>
+    <string>mqzonewx</string>
+    <string>mqzoneopensdkapiV2</string>
+    <string>mqzoneopensdkapi19</string>
+    <string>mqzoneopensdkapi</string>
+    <string>mqzoneopensdk</string>
+ </array>
+```
 
 在`Info->URL Types` 中增加QQ的scheme： `Identifier` 设置为`qq`, `URL Schemes` 设置为你注册的QQ开发者账号中的APPID，需要加前缀`tencent`，例如`tencent1104903684`
 
 在你工程的`AppDelegate.m`文件中添加如下代码：
 
 ```
-#import "../Libraries/LinkingIOS/RCTLinkingManager.h"
-
+#import <React/RCTLinkingManager.h>
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
   return [RCTLinkingManager application:application openURL:url sourceApplication:sourceApplication annotation:annotation];

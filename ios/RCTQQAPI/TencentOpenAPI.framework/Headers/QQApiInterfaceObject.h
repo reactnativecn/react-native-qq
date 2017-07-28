@@ -24,12 +24,17 @@ typedef enum
     EQQAPIAPPSHAREASYNC = 7,
     EQQAPIQQNOTSUPPORTAPI_WITH_ERRORSHOW = 8,
     EQQAPISENDFAILD = -1,
+    EQQAPISHAREDESTUNKNOWN = -2, //未指定分享到QQ或TIM
+    
+    EQQAPITIMNOTINSTALLED = 11, //TIM未安装
+    EQQAPITIMNOTSUPPORTAPI = 12, // TIM api不支持
     //qzone分享不支持text类型分享
     EQQAPIQZONENOTSUPPORTTEXT = 10000,
     //qzone分享不支持image类型分享
     EQQAPIQZONENOTSUPPORTIMAGE = 10001,
     //当前QQ版本太低，需要更新至新版本才可以支持
     EQQAPIVERSIONNEEDUPDATE = 10002,
+    ETIMAPIVERSIONNEEDUPDATE = 10004,
 } QQApiSendResultCode;
 
 #pragma mark - QQApiObject(分享对象类型)
@@ -44,15 +49,21 @@ enum
     kQQAPICtrlFlagQQShareDataline = 0x10,  //数据线
 };
 
+// 分享到QQ或TIM
+typedef enum ShareDestType {
+    ShareDestTypeQQ,
+    ShareDestTypeTIM,
+}ShareDestType;
+
 // QQApiObject
 /** \brief 所有在QQ及插件间发送的数据对象的根类。
  */
-@interface QQApiObject : NSObject
+__attribute__((visibility("default"))) @interface QQApiObject : NSObject
 @property(nonatomic,retain) NSString* title; ///< 标题，最长128个字符
 @property(nonatomic,retain) NSString* description; ///<简要描述，最长512个字符
 
 @property (nonatomic, assign) uint64_t cflag;
-
+@property (nonatomic, assign) ShareDestType shareDestType; //分享到QQ或TIM，必须指定
 @end
 
 // QQApiResultObject
@@ -68,7 +79,7 @@ enum
  <TR><TD>-5</TD><TD>client internal error</TD><TD>客户端内部处理错误</TD></TR>
  </TABLE>
  */
-@interface QQApiResultObject : QQApiObject
+__attribute__((visibility("default"))) @interface QQApiResultObject : QQApiObject
 @property(nonatomic,retain) NSString* error; ///<错误
 @property(nonatomic,retain) NSString* errorDescription; ///<错误描述
 @property(nonatomic,retain) NSString* extendInfo; ///<扩展信息
@@ -96,7 +107,7 @@ typedef enum QQApiURLTargetType{
  
  包括URL地址，URL地址所指向的目标类型及预览图像。
  */
-@interface QQApiURLObject : QQApiObject
+__attribute__((visibility("default"))) @interface QQApiURLObject : QQApiObject
 /**
  URL地址所指向的目标类型.
  @note 参见QQApi.h 中的 QQApiURLTargetType 定义.
@@ -184,22 +195,25 @@ typedef enum QQApiURLTargetType{
 @interface QQApiImageArrayForQZoneObject : QQApiObject
 
 @property(nonatomic,retain) NSArray* imageDataArray;///图片数组
+@property(nonatomic,retain) NSDictionary* extMap; // 扩展字段
 
 /**
  初始化方法
  @param imageDataArray 图片数组
  @param title 写说说的内容，可以为空
+ @param extMap 扩展字段
  */
-- (id)initWithImageArrayData:(NSArray*)imageDataArray title:(NSString*)title;
+- (id)initWithImageArrayData:(NSArray*)imageDataArray title:(NSString*)title extMap:(NSDictionary *)extMap;
 
 /**
  helper方法获取一个autorelease的<code>QQApiExtendObject</code>对象
  @param title 写说说的内容，可以为空
  @param imageDataArray 发送的多张图片队列
+ @param extMap 扩展字段
  @return
  一个自动释放的<code>QQApiExtendObject</code>实例
  */
-+ (id)objectWithimageDataArray:(NSArray*)imageDataArray title:(NSString*)title;
++ (id)objectWithimageDataArray:(NSArray*)imageDataArray title:(NSString*)title extMap:(NSDictionary *)extMap;
 
 @end
 
@@ -207,14 +221,16 @@ typedef enum QQApiURLTargetType{
 /** @brief 视频对象
  用于分享视频到空间，走写说说路径<code>QQApiObject</code>
  assetURL可传ALAsset的ALAssetPropertyAssetURL，或者PHAsset的localIdentifier
+  @param extMap 扩展字段
  */
 @interface QQApiVideoForQZoneObject : QQApiObject
 
 @property(nonatomic, retain) NSString *assetURL;
+@property(nonatomic,retain) NSDictionary* extMap; // 扩展字段
 
-- (id)initWithAssetURL:(NSString*)assetURL title:(NSString*)title;
+- (id)initWithAssetURL:(NSString*)assetURL title:(NSString*)title extMap:(NSDictionary *)extMap;
 
-+ (id)objectWithAssetURL:(NSString*)assetURL title:(NSString*)title;
++ (id)objectWithAssetURL:(NSString*)assetURL title:(NSString*)title extMap:(NSDictionary *)extMap;
 
 @end
 

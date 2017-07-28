@@ -14,6 +14,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.RCTNativeAppEventEmitter;
 import com.tencent.connect.common.Constants;
@@ -126,15 +127,26 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
     }
 
     @ReactMethod
-    public void shareToQQ(ReadableMap data, Promise promise){
-        this._shareToQQ(data, 0);
-        promise.resolve(null);
+    public void shareToQQ(final ReadableMap data, Promise promise){
+        UiThreadUtil.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                _shareToQQ(data, 0);
+                promise.resolve(null);
+            }
+        });
     }
 
     @ReactMethod
-    public void shareToQzone(ReadableMap data, Promise promise){
-        this._shareToQQ(data, 1);
-        promise.resolve(null);
+    public void shareToQzone(final ReadableMap data, Promise promise)
+    {
+        UiThreadUtil.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                _shareToQQ(data, 1);
+                promise.resolve(null);
+            }
+        });
     }
 
     private void _shareToQQ(ReadableMap data, int scene) {

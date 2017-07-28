@@ -1,4 +1,4 @@
-# react-native-qq
+# react-native-qq [![npm version](https://badge.fury.io/js/react-native-qq.svg)](http://badge.fury.io/js/react-native-qq)
 
 React Native的QQ登录插件, react-native版本需要0.33.0及以上
 

@@ -12,17 +12,10 @@
 #import <TencentOpenAPI/QQApiInterface.h>
 #import <TencentOpenAPI/QQApiInterfaceObject.h>
 
-#if __has_include(<React/RCTBridge.h>)
 #import <React/RCTLog.h>
 #import <React/RCTBridge.h>
 #import <React/RCTEventDispatcher.h>
 #import <React/RCTImageLoader.h>
-#else
-#import "RCTLog.h"
-#import "RCTEventDispatcher.h"
-#import "RCTBridge.h"
-#import "RCTImageLoader.h"
-#endif
 
 //#define NOT_REGISTERED (@"registerApp required.")
 #define INVOKE_FAILED (@"QQ API invoke returns false.")
@@ -43,6 +36,11 @@ RCT_EXPORT_MODULE();
 - (dispatch_queue_t)methodQueue
 {
     return dispatch_get_main_queue();
+}
+
+- (NSArray<NSString *> *)supportedEvents
+{
+    return @[@"QQ_Resp"];
 }
 
 - (instancetype)init
@@ -259,7 +257,7 @@ RCT_EXPORT_METHOD(logout)
     body[@"result"] =resp.result;
     body[@"extendInfo"] =resp.extendInfo;
     
-    [self.bridge.eventDispatcher sendAppEventWithName:@"QQ_Resp" body:body];
+    [self sendEventWithName:@"QQ_Resp" body:body];
 }
 
 - (void)isOnlineResponse:(NSDictionary *)response
@@ -277,7 +275,7 @@ RCT_EXPORT_METHOD(logout)
     body[@"expires_in"] = @([_qqapi.expirationDate timeIntervalSince1970]*1000);
     body[@"oauth_consumer_key"] =_qqapi.appId;
 
-    [self.bridge.eventDispatcher sendAppEventWithName:@"QQ_Resp" body:body];
+    [self sendEventWithName:@"QQ_Resp" body:body];
 }
 
 - (void)tencentDidNotLogin:(BOOL)cancelled
@@ -290,7 +288,7 @@ RCT_EXPORT_METHOD(logout)
     else {
         body[@"errMsg"] = @"login failed";
     }
-    [self.bridge.eventDispatcher sendAppEventWithName:@"QQ_Resp" body:body];
+    [self sendEventWithName:@"QQ_Resp" body:body];
     
 }
 

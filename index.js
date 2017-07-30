@@ -1,9 +1,11 @@
 /**
  * Created by Yun on 2015-12-12.
  */
-import {NativeModules, NativeAppEventEmitter} from 'react-native';
+import { NativeModules, NativeEventEmitter } from 'react-native';
 
-const {QQAPI} = NativeModules;
+const { QQAPI } = NativeModules;
+
+const QQAPIEmitter = new NativeEventEmitter(QQAPI);
 
 function translateError(err, result) {
     if (!err) {
@@ -47,7 +49,7 @@ function waitForResponse(type) {
     });
 }
 
-NativeAppEventEmitter.addListener('QQ_Resp', resp => {
+QQAPIEmitter.addListener('QQ_Resp', resp => {
     const callback = savedCallback;
     savedCallback = undefined;
     callback && callback(resp);

@@ -127,7 +127,7 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
     }
 
     @ReactMethod
-    public void shareToQQ(final ReadableMap data, Promise promise){
+    public void shareToQQ(final ReadableMap data, final Promise promise){
         UiThreadUtil.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -138,7 +138,7 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
     }
 
     @ReactMethod
-    public void shareToQzone(final ReadableMap data, Promise promise)
+    public void shareToQzone(final ReadableMap data, final Promise promise)
     {
         UiThreadUtil.runOnUiThread(new Runnable() {
             @Override

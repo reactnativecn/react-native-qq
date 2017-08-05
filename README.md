@@ -78,68 +78,15 @@ react-native link react-native-qq
 
 ### 安装Android工程
 
-在`android/settings.gradle`里添加如下代码：
-
-```
-include ':react-native-qq'
-project(':react-native-qq').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-qq/android')
-```
-
-在`app/build.gradle`里添加如下代码：
-
-```
-compile project(':react-native-qq')
-```
-
-在`android/app/build.gradle`里的`dependencies`结构中添加如下代码：
-
-```
-dependencies{
-    ... // 原本的代码
-    compile project(':react-native-qq')
-}
-```
-
-
 在`android/app/build.gradle`里，defaultConfig栏目下添加如下代码：
 
 ```
-		manifestPlaceholders = [
-            QQ_APPID: "<平台申请的APPID>"
-        ]
+manifestPlaceholders = [
+    QQ_APPID: "<平台申请的APPID>"
+]
 ```
 
 以后如果需要修改APPID，只需要修改此一处。
-
-`android/app/src/main/java/<你的包名>/MainApplication.java`中添加如下两行：
-
-```java
-...
-import cn.reactnative.modules.qq.QQPackage;  // 在public class MainApplication之前import
-
-public class MainApplication extends Application implements ReactApplication {
-
-  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
-    @Override
-    protected boolean getUseDeveloperSupport() {
-      return BuildConfig.DEBUG;
-    }
-
-    @Override
-    protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-          new QQPackage(), // 然后添加这一行
-          new MainReactPackage()
-      );
-    }
-  };
-
-  @Override
-  public ReactNativeHost getReactNativeHost() {
-      return mReactNativeHost;
-  }
-}
-```
 
 另外，确保你的MainActivity.java中有`onActivityResult`的实现：
 

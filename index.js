@@ -34,6 +34,7 @@ function waitForResponse(type) {
         }
         savedCallback = result => {
             if (result.type !== type) {
+            	reject(new Error('undefined type'));
                 return;
             }
             savedCallback = undefined;

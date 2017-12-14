@@ -25,6 +25,6 @@ repositories {
 
 dependencies {
   compile 'com.facebook.react:react-native:+'
-  compile files('libs/open_sdk_r5793_lite.jar')
+  compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 

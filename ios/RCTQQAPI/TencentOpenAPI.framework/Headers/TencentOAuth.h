@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import "sdkdef.h"
-#import "TencentOAuthObject.h"
 
 @protocol TencentSessionDelegate;
 @protocol TencentLoginDelegate;
@@ -168,18 +167,6 @@ typedef enum
 + (BOOL)iphoneTIMSupportSSOLogin;
 
 /**
- * 判断用户手机上是否安装手机QZone
- * \return YES:安装 NO:没安装
- */
-+ (BOOL)iphoneQZoneInstalled;
-
-/**
- * 判断用户手机上的手机QZone是否支持SSO登录
- * \return YES:支持 NO:不支持
- */
-+ (BOOL)iphoneQZoneSupportSSOLogin;
-
-/**
  * 登录授权
  *
  * \param permissions 授权信息列
@@ -268,14 +255,6 @@ typedef enum
 - (BOOL)getUserInfo;
 
 /**
- * SDK内置webview实现定向分享时，第三方应用可以根据应用是否在白名单里来开启该配置开关，默认为关闭；
- * 在白名单里的应用调用该接口后，即打开sdk内置webview的二级白名单开关（相对与sdk后台的白名单），
- * 那么在sdk后台白名单校验请求失败的情况下，会继续先尝试采用内置webview进行分享。
- */
-- (void)openSDKWebViewQQShareEnable;
-
-
-/**
  * 退出指定API调用
  * \param userData 用户调用某条API的时候传入的保留参数
  * \return 处理结果，YES表示成功 NO表示失败
@@ -340,7 +319,6 @@ typedef enum
  * unionID获得
  */
 - (void)didGetUnionID;
-
 @end
 
 #pragma mark - TencentSessionDelegate(开放接口回调协议)
@@ -399,7 +377,6 @@ typedef enum
 - (void)getUserInfoResponse:(APIResponse*) response;
 
 
-
 /**
  * 社交API统一回调接口
  * \param response API返回结果，具体定义参见sdkdef.h文件中\ref APIResponse
@@ -424,7 +401,6 @@ typedef enum
  * \param viewController 需要关闭的viewController
  */
 - (void)tencentOAuth:(TencentOAuth *)tencentOAuth doCloseViewController:(UIViewController *)viewController;
-
 @end
 
 #pragma mark - TencentWebViewDelegate(H5登录webview旋转方向回调)

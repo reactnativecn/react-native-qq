@@ -55,6 +55,12 @@ QQAPIEmitter.addListener('QQ_Resp', resp => {
     callback && callback(resp);
 });
 
+export function isQQInstalledAction() {
+    return QQAPI.isQQInstalled().then((res)=>{
+        () => waitForResponse("QQAuthorizeResponse")
+    })
+}
+
 export function login(scopes) {
     return QQAPI.login(scopes)
         .then(() => waitForResponse("QQAuthorizeResponse"));
@@ -73,6 +79,7 @@ export function shareToQzone(data={}) {
 export function logout(){
     QQAPI.logout()
 }
+
 
 
 

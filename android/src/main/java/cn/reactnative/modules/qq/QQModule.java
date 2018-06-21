@@ -50,6 +50,7 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
     private static final String RCTQQShareDescription = "description";
     private static final String RCTQQShareWebpageUrl = "webpageUrl";
     private static final String RCTQQShareImageUrl = "imageUrl";
+    private static final String RCTQQShareLocalImage = "imageLocal";
 
     private static final int SHARE_RESULT_CODE_SUCCESSFUL = 0;
     private static final int SHARE_RESULT_CODE_FAILED = 1;
@@ -164,6 +165,10 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
         if (data.hasKey(RCTQQShareImageUrl)){
             bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, data.getString(RCTQQShareImageUrl));
         }
+        if (data.hasKey(RCTQQShareLocalImage)){
+            bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, data.getString(RCTQQShareLocalImage));
+        }
+
         if (data.hasKey("appName")){
             bundle.putString(QQShare.SHARE_TO_QQ_APP_NAME, data.getString("appName"));
         }
@@ -177,7 +182,6 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
             bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
         } else if (type.equals(RCTQQShareTypeImage)){
             bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE);
-            bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, data.getString(RCTQQShareImageUrl));
         } else if (type.equals(RCTQQShareTypeAudio)) {
             bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_AUDIO);
             if (data.hasKey("flashUrl")){

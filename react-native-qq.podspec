@@ -8,7 +8,7 @@
 
 require "json"
 
-package = JSON.parse(File.read(File.join(__dir__, "../package.json")))
+package = JSON.parse(File.read('package.json'))
 
 Pod::Spec.new do |s|
   
@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
   s.homepage     = package["homepage"]
   s.license      = package["license"]
   s.platform     = :ios, "9.0"
-  s.source       = { :git => "https://github.com/EternalChildren/react-native-qq.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/EternalChildren/react-native-qq.git"}
   s.source_files  = "ios/**/*.{h,m}"
   s.vendored_frameworks = 'ios/RCTQQAPI/TencentOpenAPI.framework'
   s.libraries = 'iconv', 'sqlite3', 'c++', 'z'

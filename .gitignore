@@ -1,2 +1,35 @@
-/android/build
+# VSCode
+.vscode/
+typings/
+typings.json
+
+# Node
+node_modules/
+
+# Xcode
+*.xcuserstate
+ios/Podfile.lock
+ios/Pods/
+ios/euler_app_v1.xcworkspace/xcuserdata/
+ios/euler_app_v1.xcodeproj/xcuserdata/
+
+# Android
 .idea
+.gradle
+local.properties
+*.iml
+android/app/build
+android/update/library/build
+android/gradle/
+android/gradlew
+android/gradlew.bat
+
+# Watchman
+.watchmanconfig
+
+*.log
+.nvm
+package-lock.json
+
+# OS X
+.DS_Store

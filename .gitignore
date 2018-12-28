@@ -10,8 +10,8 @@ node_modules/
 *.xcuserstate
 ios/Podfile.lock
 ios/Pods/
-ios/euler_app_v1.xcworkspace/xcuserdata/
-ios/euler_app_v1.xcodeproj/xcuserdata/
+ios/RCTQQAPI.xcworkspace/xcuserdata/
+ios/RCTQQAPI.xcodeproj/xcuserdata/
 
 # Android
 .idea

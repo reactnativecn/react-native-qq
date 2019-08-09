@@ -1,6 +1,6 @@
 {
   "name": "react-native-qq-nevo",
-  "version": "3.0.7",
+  "version": "3.0.8",
   "description": "QQ Login&Share support in React Native.",
   "main": "index.js",
   "scripts": {

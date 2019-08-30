@@ -26,5 +26,5 @@ Pod::Spec.new do |s|
   s.preserve_paths         = "package.json", "LICENSE", "LICENSE-docs"
   s.dependency "React"
   s.vendored_framework     = "ios/RCTQQAPI/normal/TencentOpenAPI.framework"
-  s.libraries              = "libiconv", "libsqlite3", "libz", "libc++"
+  s.libraries              = "iconv", "sqlite3", "z", "c++"
 end

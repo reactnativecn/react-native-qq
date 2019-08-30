@@ -22,9 +22,9 @@ Pod::Spec.new do |s|
   s.author                 = "tonyYo"
   s.platforms              = { :ios => "9.0", :tvos => "9.2" }
   s.source                 = source
-  s.source_files           = "ios/RCTUmengAnalytics/*.{h,m}"
+  s.source_files           = "ios/RCTQQAPI/*.{h,m}"
   s.preserve_paths         = "package.json", "LICENSE", "LICENSE-docs"
   s.dependency "React"
-  s.vendored_framework     = "ios/RCTQQAPI/normal/TencentOpenAPI.framework"
+  s.vendored_framework     = "ios/RCTQQAPI/TencentOpenAPI.framework"
   s.libraries              = "iconv", "sqlite3", "z", "c++"
 end

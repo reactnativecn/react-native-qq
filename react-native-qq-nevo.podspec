@@ -15,6 +15,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/yiky84119/react-native-alipays.git", :tag => "v#{s.version}" }
   s.source_files  = "ios/**/*.{h,m}"
 
+  s.frameworks = "WebKit"
   s.vendored_frameworks = "ios/RCTQQAPI/TencentOpenAPI.framework"
   s.libraries = "iconv", "sqlite3", "z", "c++"
 

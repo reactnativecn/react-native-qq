@@ -38,6 +38,11 @@ RCT_EXPORT_MODULE();
     return dispatch_get_main_queue();
 }
 
++ (BOOL)requiresMainQueueSetup
+{
+    return YES;
+}
+
 - (NSArray<NSString *> *)supportedEvents
 {
     return @[@"QQ_Resp"];

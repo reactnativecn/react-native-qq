@@ -296,4 +296,9 @@ RCT_EXPORT_METHOD(logout)
 {
 }
 
++ (BOOL)requiresMainQueueSetup
+{
+    return YES;
+}
+    
 @end

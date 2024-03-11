@@ -21,6 +21,6 @@
 #define RCTQQShareWebpageUrl @"webpageUrl"
 #define RCTQQShareImageUrl @"imageUrl"
 
-@interface RCTQQAPI : RCTEventEmitter<RCTBridgeModule>
+@interface RCTQQAPI : RCTEventEmitter
 
 @end

@@ -164,6 +164,8 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
         if (data.hasKey(RCTQQShareImageUrl)){
             bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, data.getString(RCTQQShareImageUrl));
         }
+
+
         if (data.hasKey("appName")){
             bundle.putString(QQShare.SHARE_TO_QQ_APP_NAME, data.getString("appName"));
         }
@@ -177,7 +179,10 @@ public class QQModule extends ReactContextBaseJavaModule implements IUiListener,
             bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
         } else if (type.equals(RCTQQShareTypeImage)){
             bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE);
-            bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, data.getString(RCTQQShareImageUrl));
+            if (data.hasKey(RCTQQShareImageUrl)) {
+                bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, data.getString(RCTQQShareImageUrl));
+                bundle.remove(QQShare.SHARE_TO_QQ_IMAGE_URL);
+            }
         } else if (type.equals(RCTQQShareTypeAudio)) {
             bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_AUDIO);
             if (data.hasKey("flashUrl")){
